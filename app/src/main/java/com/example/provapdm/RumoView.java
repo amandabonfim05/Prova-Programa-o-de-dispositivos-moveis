@@ -3,18 +3,17 @@ package com.example.provapdm;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Shader;
+import android.location.GnssStatus;
 import android.util.AttributeSet;
 import android.view.View;
 
 public class RumoView extends View {
     private Paint paint;
-    private Paint backgroundPaint;
     private Paint textPaint;
-    private float rumo = 0;
+    private Paint needlePaint;
+    private float direction = 0;
 
     public RumoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -28,74 +27,60 @@ public class RumoView extends View {
 
     private void init() {
         paint = new Paint();
-        paint.setStrokeWidth(10);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setAntiAlias(true); //suavizar as bordas
-
-        paint.setShader(new LinearGradient(0, 0, 0, getHeight(),
-                Color.BLUE, Color.CYAN, Shader.TileMode.CLAMP));
-
-        backgroundPaint = new Paint();
-        backgroundPaint.setColor(Color.LTGRAY);
-        backgroundPaint.setStyle(Paint.Style.FILL);
-        backgroundPaint.setShadowLayer(15, 0, 0, Color.BLACK);
-
+        paint.setStrokeWidth(8);
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
         textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
         textPaint.setTextSize(50);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setAntiAlias(true);
+        needlePaint = new Paint();
+        needlePaint.setColor(Color.CYAN);
+        needlePaint.setStyle(Paint.Style.FILL);
+        needlePaint.setAntiAlias(true);
     }
 
-    public void setRumo(float rumo) {
-        this.rumo = rumo;
+    public void setDirection(float direction) {
+        this.direction = direction;
         invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         int width = getWidth();
         int height = getHeight();
-
-        float centroX = width / 2;
-        float centroY = height / 2;
-
-        float tamanho = Math.min(centroX, centroY) * 2 - 20;
-        float esquerda = centroX - tamanho / 2;
-        float cima = centroY - tamanho / 2;
-        float direita = centroX + tamanho / 2;
-        float baixo = centroY + tamanho / 2;
-
-        canvas.drawRect(esquerda, cima, direita, baixo, backgroundPaint);
-
-        float fimX = (float) (centroX + (Math.cos(Math.toRadians(rumo)) * (tamanho / 2)));
-        float fimY = (float) (centroY + (Math.sin(Math.toRadians(rumo)) * (tamanho / 2)));
-
-        desenharSeta(canvas, centroX, centroY, fimX, fimY);
-
-        canvas.drawText(String.format("%.0f°", rumo), centroX, centroY + textPaint.getTextSize() / 4, textPaint);
+        float centerX = width / 2;
+        float centerY = height / 2;
+        float radius = Math.min(centerX, centerY) - 20;
+        textPaint.setTextSize(30);
+        canvas.drawText("N", centerX, centerY - radius + 50, textPaint);
+        canvas.drawText("S", centerX, centerY + radius - 20, textPaint);
+        canvas.drawText("E", centerX + radius - 20, centerY + 5, textPaint);
+        canvas.drawText("W", centerX - radius + 20, centerY + 5, textPaint);
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(10);
+        canvas.drawCircle(centerX, centerY, radius, paint);
+        drawNeedle(canvas, centerX, centerY, radius);
     }
 
-    private void desenharSeta(Canvas canvas, float inicioX, float inicioY, float fimX, float fimY) {
-        canvas.drawLine(inicioX, inicioY, fimX, fimY, paint);
-
-        float anguloSeta = (float) Math.atan2(fimY - inicioY, fimX - inicioX);
-        float tamanhoSeta = 40;
-        float larguraSeta = 20;
-
-        float setaX1 = fimX - tamanhoSeta * (float) Math.cos( - Math.PI / 6);
-        float setaY1 = fimY - tamanhoSeta * (float) Math.sin(anguloSeta - Math.PI / 6);
-        float setaX2 = fimX - tamanhoSeta * (float) Math.cos(anguloSeta + Math.PI / 6);
-        float setaY2 = fimY - tamanhoSeta * (float) Math.sin(anguloSeta + Math.PI / 6);
-
-        Path caminhoSeta = new Path();
-        caminhoSeta.moveTo(fimX, fimY);
-        caminhoSeta.lineTo(setaX1, setaY1);
-        caminhoSeta.lineTo(setaX2, setaY2);
-        caminhoSeta.close();
-
-        canvas.drawPath(caminhoSeta, paint);
+    private void drawNeedle(Canvas canvas, float centerX, float centerY, float radius) {
+        float needleLength = radius - 40;
+        float needleBaseRadius = 30;
+        float endX = (float) (centerX + Math.cos(Math.toRadians(direction)) * needleLength);
+        float endY = (float) (centerY + Math.sin(Math.toRadians(direction)) * needleLength);
+        canvas.drawLine(centerX, centerY, endX, endY, needlePaint);
+        needlePaint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(centerX, centerY, needleBaseRadius, needlePaint);
+        Path needleTip = new Path();
+        needleTip.moveTo(endX, endY);
+        needleTip.lineTo((float) (centerX + Math.cos(Math.toRadians(direction - 150)) * 50),
+                (float) (centerY + Math.sin(Math.toRadians(direction - 150)) * 50));
+        needleTip.lineTo((float) (centerX + Math.cos(Math.toRadians(direction + 150)) * 50),
+                (float) (centerY + Math.sin(Math.toRadians(direction + 150)) * 50));
+        needleTip.close();
+        canvas.drawPath(needleTip, needlePaint);
     }
 }

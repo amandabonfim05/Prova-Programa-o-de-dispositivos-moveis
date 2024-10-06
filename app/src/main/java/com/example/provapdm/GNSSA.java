@@ -14,9 +14,12 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.Manifest;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class GNSSA extends AppCompatActivity {
     private LocationManager locationManager;
@@ -124,33 +127,26 @@ public class GNSSA extends AppCompatActivity {
             @Override
             public void onSatelliteStatusChanged(@NonNull GnssStatus status) {
                 super.onSatelliteStatusChanged(status);
+                EsferaCelesteView esferaCelesteView = findViewById(R.id.esferacelesteview_id);
+                esferaCelesteView.setGnssStatus(status);
                 mostraGNSSGrafico(status);
             }
         });
+
     }
 
     public void mostraGNSSGrafico(GnssStatus status) {
-        EsferaCelesteView esferaCelesteView = findViewById(R.id.esferacelesteview_id);
-        esferaCelesteView.setNovoStatus(status);
-    }
-
-    public void mostraGNSS(GnssStatus status) {
-        TextView textView = findViewById(R.id.textviewGnss_id);
-        String dados = "Dados do Sistema de Posicionamento\n";
-        if (status != null) {
-            dados += "Número de Satélites:" + status.getSatelliteCount() + "\n";
-            for (int i = 0; i < status.getSatelliteCount(); i++) {
-                dados += "SVID-CONST-SNR="
-                        + status.getSvid(i) + "-"
-                        + status.getConstellationType(i) + "-"
-                        + status.getCn0DbHz(i) +
-                        "Azi=" + status.getAzimuthDegrees(i) +
-                        "Elev=" + status.getElevationDegrees(i) + "\n";
-            }
-        } else {
-            dados += "GNSS Não disponível";
+        ArrayList<String> satelliteIds = new ArrayList<>();
+        ArrayList<Float> signalQualityData = new ArrayList<>();
+        int satelliteCount = status.getSatelliteCount();
+        for (int i = 0; i < satelliteCount; i++) {
+            int svid = status.getSvid(i);
+            float signalQuality = status.getCn0DbHz(i);
+            satelliteIds.add(String.valueOf(svid));
+            signalQualityData.add(signalQuality);
         }
-        textView.setText(dados);
+        QualidadeSateliteView qualidadeSateliteView = findViewById(R.id.QualidadeSateliteView);
+        qualidadeSateliteView.setSignalQualityData(satelliteIds, signalQualityData);
     }
 
     public void mostraLocation(Location location) {
@@ -163,12 +159,12 @@ public class GNSSA extends AppCompatActivity {
                     + "Longitude: " + longitudeSatelite + "\n"
                     + "Velocidade (m/s): " + location.getSpeed();
 
+            Log.d("RumoView", "Direção definida: " + location.getBearing());
             RumoView rumoView = findViewById(R.id.rumoView_id);
-            rumoView.setRumo(location.getBearing());
+            rumoView.setDirection(location.getBearing());
         } else {
             dados += "Localização Não disponível";
         }
         textViewLocation.setText(dados);
     }
 }
-

@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
 
 
@@ -30,6 +32,8 @@
         </activity>
         <activity android:name=".GNSSA"></activity>
         <activity android:name=".EsferaCelesteView"></activity>
+        <activity android:name=".QualidadeSateliteView"></activity>
+        <activity android:name=".RumoView"></activity>
 
     </application>
 
