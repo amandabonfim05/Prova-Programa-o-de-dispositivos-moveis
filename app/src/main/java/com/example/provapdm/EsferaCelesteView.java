@@ -9,12 +9,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.location.GnssStatus;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,29 +26,28 @@ public class EsferaCelesteView extends View {
     private int r;
     private int height, width;
     private Random random;
-    private ArrayList<Star> stars;
+    private ArrayList<estrela> estrelas;
 
     private boolean filtroGPS = true;
     private boolean filtroGalileo = true;
     private boolean filtroGlonass = true;
     private boolean filtroUsado = true;
 
-    private class Star {
-        float x, y, speed;
+    private class estrela {
+        float x, y, velocidade;
 
-        Star(float x, float y, float speed) {
+        estrela(float x, float y, float speed) {
             this.x = x;
             this.y = y;
-            this.speed = speed;
+            this.velocidade = speed;
         }
 
         void updatePosition() {
-            y += speed;
+            y += velocidade;
             if (y > r) {
-                // Reinicia a estrela na parte superior com nova velocidade
                 y = -r;
                 x = random.nextFloat() * 2 * r - r;
-                speed = 0.5f + random.nextFloat();
+                velocidade = 0.5f + random.nextFloat();
             }
         }
     }
@@ -60,7 +56,7 @@ public class EsferaCelesteView extends View {
         super(context, attrs);
         paint = new Paint();
         random = new Random();
-        stars = new ArrayList<>();
+        estrelas = new ArrayList<>();
 
         for (int i = 0; i < 300; i++) {
             float angle = random.nextFloat() * 2 * (float) Math.PI;
@@ -68,7 +64,7 @@ public class EsferaCelesteView extends View {
             float x = radius * (float) Math.cos(angle);
             float y = radius * (float) Math.sin(angle);
             float speed = 0.5f + random.nextFloat();
-            stars.add(new Star(x, y, speed));
+            estrelas.add(new estrela(x, y, speed));
         }
 
         setOnClickListener(new OnClickListener() {
@@ -79,9 +75,9 @@ public class EsferaCelesteView extends View {
         });
     }
 
-    private boolean deveDesenharSatelite(int satelliteIndex) {
-        int tipoConstelacao = newStatus.getConstellationType(satelliteIndex);
-        boolean usandoFix = newStatus.usedInFix(satelliteIndex);
+    private boolean deveDesenharSatelite(int sateliteIndex) {
+        int tipoConstelacao = newStatus.getConstellationType(sateliteIndex);
+        boolean usandoFix = newStatus.usedInFix(sateliteIndex);
         boolean ChecandoConstelacao = (tipoConstelacao == GnssStatus.CONSTELLATION_GPS && filtroGPS) ||
                 (tipoConstelacao == GnssStatus.CONSTELLATION_GALILEO && filtroGalileo) ||
                 (tipoConstelacao == GnssStatus.CONSTELLATION_GLONASS && filtroGlonass);
@@ -128,16 +124,16 @@ public class EsferaCelesteView extends View {
 
     private void desenharEstrelas(Canvas canvas) {
         paint.setColor(Color.WHITE);
-        for (Star star : stars) {
-            if (Math.sqrt(star.x * star.x + star.y * star.y) <= r) {
-                canvas.drawCircle(computarXc(star.x), computarYc(star.y), 2, paint);
+        for (EsferaCelesteView.estrela estrela : estrelas) {
+            if (Math.sqrt(estrela.x * estrela.x + estrela.y * estrela.y) <= r) {
+                canvas.drawCircle(computarXc(estrela.x), computarYc(estrela.y), 2, paint);
             } else {
-                float angle = random.nextFloat() * 2 * (float) Math.PI;
-                float radius = random.nextFloat() * r;
-                star.x = radius * (float) Math.cos(angle);
-                star.y = radius * (float) Math.sin(angle);
+                float angulo = random.nextFloat() * 2 * (float) Math.PI;
+                float raio = random.nextFloat() * r;
+                estrela.x = raio * (float) Math.cos(angulo);
+                estrela.y = raio * (float) Math.sin(angulo);
             }
-            star.updatePosition();
+            estrela.updatePosition();
         }
     }
 
@@ -155,9 +151,9 @@ public class EsferaCelesteView extends View {
 
             case GnssStatus.CONSTELLATION_GLONASS:
                 paint.setColor(Color.RED);
-                float[] diamondX = {cx, cx - 10, cx, cx + 10};
-                float[] diamondY = {cy - 10, cy, cy + 10, cy};
-                canvas.drawPath(createDiamondPath(diamondX, diamondY), paint);
+                float[] caminhoX = {cx, cx - 10, cx, cx + 10};
+                float[] caminhoY = {cy - 10, cy, cy + 10, cy};
+                canvas.drawPath(criarCaminho(caminhoX, caminhoY), paint);
                 break;
 
             default:
@@ -180,7 +176,7 @@ public class EsferaCelesteView extends View {
         canvas.drawCircle(cx, cy, size / 3, paint);
     }
 
-    private Path createDiamondPath(float[] xPoints, float[] yPoints) {
+    private Path criarCaminho(float[] xPoints, float[] yPoints) {
         Path path = new Path();
         path.moveTo(xPoints[0], yPoints[0]);
         path.lineTo(xPoints[1], yPoints[1]);
@@ -263,7 +259,7 @@ public class EsferaCelesteView extends View {
                 filtroGalileo = checkBoxGalileo.isChecked();
                 filtroGlonass = checkBoxGlonass.isChecked();
                 filtroUsado = checkBoxUsado.isChecked();
-                invalidate(); // Redesenhar a view
+                invalidate();
             }
         });
 

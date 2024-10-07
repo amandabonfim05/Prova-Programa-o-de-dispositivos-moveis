@@ -13,34 +13,31 @@ import java.util.ArrayList;
 
 public class QualidadeSateliteView extends View {
     private Paint paint;
-    private ArrayList<String> satelliteNames;
-    private ArrayList<Float> signalQualityData;
+    private ArrayList<String> nomesSatelites;
+    private ArrayList<Float> dadosQualidadeSatelites;
 
 
     public QualidadeSateliteView(Context context, AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
-        satelliteNames = new ArrayList<>();
-        signalQualityData = new ArrayList<>();
+        nomesSatelites = new ArrayList<>();
+        dadosQualidadeSatelites = new ArrayList<>();
     }
 
-    public void setSignalQualityData(ArrayList<String> names, ArrayList<Float> qualities) {
-        this.satelliteNames = names;
-        this.signalQualityData = qualities;
-
+    public void setSignalQualityData(ArrayList<String> nomes, ArrayList<Float> qualidade) {
+        this.nomesSatelites = nomes;
+        this.dadosQualidadeSatelites = qualidade;
         invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         float width = getWidth();
         float height = getHeight();
-
-        float barWidth = width / (satelliteNames.size() * 1.5f);
-        float maxBarHeight = height - 100;
-        float startX = (width - (barWidth * satelliteNames.size() * 1.5f)) / 2;
+        float barraWidth = width / (nomesSatelites.size() * 1.5f);
+        float maxBarraHeight = height - 100;
+        float comecaX = (width - (barraWidth * nomesSatelites.size() * 1.5f)) / 2;
 
 
         paint.setColor(Color.BLACK);
@@ -60,56 +57,50 @@ public class QualidadeSateliteView extends View {
         canvas.drawText("Qualidade do Sinal GNSS", width / 2 - paint.measureText("Qualidade do Sinal GNSS") / 2, 50, paint);
 
 
-        for (int i = 0; i < satelliteNames.size(); i++) {
-            float signalQuality = signalQualityData.get(i);
+        for (int i = 0; i < nomesSatelites.size(); i++) {
+            float qualidadeSinal = dadosQualidadeSatelites.get(i);
 
-            int color;
-            if (signalQuality < 20) {
-                color = Color.RED;
-            } else if (signalQuality < 40) {
-                color = Color.YELLOW;
+            int cor;
+            if (qualidadeSinal < 20) {
+                cor = Color.RED;
+            } else if (qualidadeSinal < 40) {
+                cor = Color.YELLOW;
             } else {
-                color = Color.GREEN;
+                cor = Color.GREEN;
             }
 
-
             paint.setShader(new LinearGradient(
-                    startX + i * barWidth * 1.5f, maxBarHeight,
-                    startX + (i * barWidth * 1.5f) + barWidth, maxBarHeight - (signalQuality / 60) * maxBarHeight,
-                    color, Color.DKGRAY, Shader.TileMode.CLAMP));
-
+                    comecaX + i * barraWidth * 1.5f, maxBarraHeight,
+                    comecaX + (i * barraWidth * 1.5f) + barraWidth, maxBarraHeight - (qualidadeSinal / 60) * maxBarraHeight,
+                    cor, Color.DKGRAY, Shader.TileMode.CLAMP));
 
             canvas.drawRoundRect(
-                    startX + i * barWidth * 1.5f, maxBarHeight - (signalQuality / 60) * maxBarHeight,
-                    startX + (i * barWidth * 1.5f) + barWidth, maxBarHeight,
+                    comecaX + i * barraWidth * 1.5f, maxBarraHeight - (qualidadeSinal / 60) * maxBarraHeight,
+                    comecaX + (i * barraWidth * 1.5f) + barraWidth, maxBarraHeight,
                     20, 20, paint);
-
 
             paint.setShader(null);
-
-
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(Color.BLACK);
-            canvas.drawRoundRect(
-                    startX + i * barWidth * 1.5f, maxBarHeight - (signalQuality / 60) * maxBarHeight,
-                    startX + (i * barWidth * 1.5f) + barWidth, maxBarHeight,
-                    20, 20, paint);
 
+            canvas.drawRoundRect(
+                    comecaX + i * barraWidth * 1.5f, maxBarraHeight - (qualidadeSinal / 60) * maxBarraHeight,
+                    comecaX + (i * barraWidth * 1.5f) + barraWidth, maxBarraHeight,
+                    20, 20, paint);
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.WHITE);
             paint.setTextSize(30);
 
+            String svidTexto = nomesSatelites.get(i);
+            canvas.drawText(svidTexto,
+                    comecaX + (i * barraWidth * 1.5f) + barraWidth / 2 - paint.measureText(svidTexto) / 2,
+                    maxBarraHeight + 30, paint);
 
-            String svidText = satelliteNames.get(i);
-            canvas.drawText(svidText,
-                    startX + (i * barWidth * 1.5f) + barWidth / 2 - paint.measureText(svidText) / 2,
-                    maxBarHeight + 30, paint);
-
-            String signalQualityText = String.valueOf((int) signalQuality);
-            canvas.drawText(signalQualityText,
-                    startX + (i * barWidth * 1.5f) + barWidth / 2 - paint.measureText(signalQualityText) / 2,
-                    maxBarHeight - (signalQuality / 60) * maxBarHeight - 10, paint);
+            String textoQualidadeSinal = String.valueOf((int) qualidadeSinal);
+            canvas.drawText(textoQualidadeSinal,
+                    comecaX + (i * barraWidth * 1.5f) + barraWidth / 2 - paint.measureText(textoQualidadeSinal) / 2,
+                    maxBarraHeight - (qualidadeSinal / 60) * maxBarraHeight - 10, paint);
         }
     }
 

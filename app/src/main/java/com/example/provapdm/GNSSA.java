@@ -27,16 +27,16 @@ public class GNSSA extends AppCompatActivity {
     private static final int REQUEST_LOCATION = 1;
     private int latitudeFormato = Location.FORMAT_SECONDS;
     private int longitudeFormato = Location.FORMAT_SECONDS;
-    private TextView textViewLocation;
+    private TextView textViewLocalizacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.esfera_celeste_layout);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        textViewLocation = findViewById(R.id.textviewLocation_id);
+        textViewLocalizacao = findViewById(R.id.textviewLocation_id);
 
-        textViewLocation.setOnClickListener(new View.OnClickListener() {
+        textViewLocalizacao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mostrarDialogoDeEscolha();
@@ -136,35 +136,35 @@ public class GNSSA extends AppCompatActivity {
     }
 
     public void mostraGNSSGrafico(GnssStatus status) {
-        ArrayList<String> satelliteIds = new ArrayList<>();
-        ArrayList<Float> signalQualityData = new ArrayList<>();
-        int satelliteCount = status.getSatelliteCount();
-        for (int i = 0; i < satelliteCount; i++) {
+        ArrayList<String> sateliteIds = new ArrayList<>();
+        ArrayList<Float> dadosQualidadeSinal = new ArrayList<>();
+        int contagemSatelites = status.getSatelliteCount();
+        for (int i = 0; i < contagemSatelites; i++) {
             int svid = status.getSvid(i);
-            float signalQuality = status.getCn0DbHz(i);
-            satelliteIds.add(String.valueOf(svid));
-            signalQualityData.add(signalQuality);
+            float qaulidadeSinal = status.getCn0DbHz(i);
+            sateliteIds.add(String.valueOf(svid));
+            dadosQualidadeSinal.add(qaulidadeSinal);
         }
         QualidadeSateliteView qualidadeSateliteView = findViewById(R.id.QualidadeSateliteView);
-        qualidadeSateliteView.setSignalQualityData(satelliteIds, signalQualityData);
+        qualidadeSateliteView.setSignalQualityData(sateliteIds, dadosQualidadeSinal);
     }
 
-    public void mostraLocation(Location location) {
+    public void mostraLocation(Location localizacao) {
         String dados = "Dados da Última posição\n";
-        if (location != null) {
-            String latitudeSatelite = Location.convert(location.getLatitude(), latitudeFormato);
-            String longitudeSatelite = Location.convert(location.getLongitude(), longitudeFormato);
+        if (localizacao != null) {
+            String latitudeSatelite = Location.convert(localizacao.getLatitude(), latitudeFormato);
+            String longitudeSatelite = Location.convert(localizacao.getLongitude(), longitudeFormato);
 
             dados += "Latitude: " + latitudeSatelite + "\n"
                     + "Longitude: " + longitudeSatelite + "\n"
-                    + "Velocidade (m/s): " + location.getSpeed();
+                    + "Velocidade (m/s): " + localizacao.getSpeed();
 
-            Log.d("RumoView", "Direção definida: " + location.getBearing());
+            Log.d("RumoView", "Direção definida: " + localizacao.getBearing());
             RumoView rumoView = findViewById(R.id.rumoView_id);
-            rumoView.setDirection(location.getBearing());
+            rumoView.setDirecao(localizacao.getBearing());
         } else {
             dados += "Localização Não disponível";
         }
-        textViewLocation.setText(dados);
+        textViewLocalizacao.setText(dados);
     }
 }

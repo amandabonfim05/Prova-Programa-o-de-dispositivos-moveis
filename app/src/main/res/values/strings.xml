@@ -1,3 +1,40 @@
 <resources>
     <string name="app_name">Prova pdm</string>
+    <!-- Português -->
+    <string name="satellite_filter_title">Filtros de Satélites</string>
+    <string name="satellite_filter_message">Selecione os tipos de satélites que deseja visualizar:</string>
+    <string name="gps_filter">GPS</string>
+    <string name="galileo_filter">Galileo</string>
+    <string name="glonass_filter">GLONASS</string>
+    <string name="used_in_fix_filter">Usado em Fix</string>
+    <string name="ok_button">OK</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="gnss_signal_quality_title">Qualidade do Sinal GNSS</string>
+    <string name="satellite_id">ID:</string>
+    <string name="constellation">Constelação:</string>
+    <string name="used">Usado:</string>
+    <string name="not_used">Não usado</string>
+    <string name="choose_format_title">Escolha o formato para coordenadas:</string>
+    <string name="location_permission_denied">Sem permissão para acessar o sistema de posicionamento</string>
+    <string name="location_data_title">Dados da Última posição</string>
+    <string name="location_not_available">Localização Não disponível</string>
+
+    <!-- Inglês -->
+    <string name="satellite_filter_title_en">Satellite Filters</string>
+    <string name="satellite_filter_message_en">Select the types of satellites you want to view:</string>
+    <string name="gps_filter_en">GPS</string>
+    <string name="galileo_filter_en">Galileo</string>
+    <string name="glonass_filter_en">GLONASS</string>
+    <string name="used_in_fix_filter_en">Used in Fix</string>
+    <string name="ok_button_en">OK</string>
+    <string name="cancel_button_en">Cancel</string>
+    <string name="gnss_signal_quality_title_en">GNSS Signal Quality</string>
+    <string name="satellite_id_en">ID:</string>
+    <string name="constellation_en">Constellation:</string>
+    <string name="used_en">Used:</string>
+    <string name="not_used_en">Not used</string>
+    <string name="choose_format_title_en">Choose the format for coordinates:</string>
+    <string name="location_permission_denied_en">No permission to access the positioning system</string>
+    <string name="location_data_title_en">Last Position Data</string>
+    <string name="location_not_available_en">Location Not Available</string>
 </resources>

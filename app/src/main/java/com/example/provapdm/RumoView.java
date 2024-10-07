@@ -5,15 +5,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.location.GnssStatus;
 import android.util.AttributeSet;
 import android.view.View;
 
 public class RumoView extends View {
     private Paint paint;
     private Paint textPaint;
-    private Paint needlePaint;
-    private float direction = 0;
+    private Paint setaPaint;
+    private float direcao = 0;
 
     public RumoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -36,14 +35,14 @@ public class RumoView extends View {
         textPaint.setTextSize(50);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setAntiAlias(true);
-        needlePaint = new Paint();
-        needlePaint.setColor(Color.CYAN);
-        needlePaint.setStyle(Paint.Style.FILL);
-        needlePaint.setAntiAlias(true);
+        setaPaint = new Paint();
+        setaPaint.setColor(Color.CYAN);
+        setaPaint.setStyle(Paint.Style.FILL);
+        setaPaint.setAntiAlias(true);
     }
 
-    public void setDirection(float direction) {
-        this.direction = direction;
+    public void setDirecao(float direcao) {
+        this.direcao = direcao;
         invalidate();
     }
 
@@ -52,35 +51,35 @@ public class RumoView extends View {
         super.onDraw(canvas);
         int width = getWidth();
         int height = getHeight();
-        float centerX = width / 2;
-        float centerY = height / 2;
-        float radius = Math.min(centerX, centerY) - 20;
+        float centroX = width / 2;
+        float centroY = height / 2;
+        float raio = Math.min(centroX, centroY) - 20;
         textPaint.setTextSize(30);
-        canvas.drawText("N", centerX, centerY - radius + 50, textPaint);
-        canvas.drawText("S", centerX, centerY + radius - 20, textPaint);
-        canvas.drawText("E", centerX + radius - 20, centerY + 5, textPaint);
-        canvas.drawText("W", centerX - radius + 20, centerY + 5, textPaint);
+        canvas.drawText("N", centroX, centroY - raio + 50, textPaint);
+        canvas.drawText("S", centroX, centroY + raio - 20, textPaint);
+        canvas.drawText("E", centroX + raio - 20, centroY + 5, textPaint);
+        canvas.drawText("W", centroX - raio + 20, centroY + 5, textPaint);
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(10);
-        canvas.drawCircle(centerX, centerY, radius, paint);
-        drawNeedle(canvas, centerX, centerY, radius);
+        canvas.drawCircle(centroX, centroY, raio, paint);
+        desenhaAgulha(canvas, centroX, centroY, raio);
     }
 
-    private void drawNeedle(Canvas canvas, float centerX, float centerY, float radius) {
-        float needleLength = radius - 40;
-        float needleBaseRadius = 30;
-        float endX = (float) (centerX + Math.cos(Math.toRadians(direction)) * needleLength);
-        float endY = (float) (centerY + Math.sin(Math.toRadians(direction)) * needleLength);
-        canvas.drawLine(centerX, centerY, endX, endY, needlePaint);
-        needlePaint.setStyle(Paint.Style.FILL);
-        canvas.drawCircle(centerX, centerY, needleBaseRadius, needlePaint);
-        Path needleTip = new Path();
-        needleTip.moveTo(endX, endY);
-        needleTip.lineTo((float) (centerX + Math.cos(Math.toRadians(direction - 150)) * 50),
-                (float) (centerY + Math.sin(Math.toRadians(direction - 150)) * 50));
-        needleTip.lineTo((float) (centerX + Math.cos(Math.toRadians(direction + 150)) * 50),
-                (float) (centerY + Math.sin(Math.toRadians(direction + 150)) * 50));
-        needleTip.close();
-        canvas.drawPath(needleTip, needlePaint);
+    private void desenhaAgulha(Canvas canvas, float centroX, float centroY, float raio) {
+        float comprimentoSeta = raio - 40;
+        float baseRaioSeta = 30;
+        float fimX = (float) (centroX + Math.cos(Math.toRadians(direcao)) * comprimentoSeta);
+        float fimY = (float) (centroY + Math.sin(Math.toRadians(direcao)) * comprimentoSeta);
+        canvas.drawLine(centroX, centroY, fimX, fimY, setaPaint);
+        setaPaint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(centroX, centroY, baseRaioSeta, setaPaint);
+        Path pontaSeta = new Path();
+        pontaSeta.moveTo(fimX, fimY);
+        pontaSeta.lineTo((float) (centroX + Math.cos(Math.toRadians(direcao - 150)) * 50),
+                (float) (centroY + Math.sin(Math.toRadians(direcao - 150)) * 50));
+        pontaSeta.lineTo((float) (centroX + Math.cos(Math.toRadians(direcao + 150)) * 50),
+                (float) (centroY + Math.sin(Math.toRadians(direcao + 150)) * 50));
+        pontaSeta.close();
+        canvas.drawPath(pontaSeta, setaPaint);
     }
 }
