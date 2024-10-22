@@ -21,13 +21,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class EsferaCelesteView extends View {
-    private GnssStatus newStatus;
+    private GnssStatus newStatus; // guarda o status dos satelites
     private Paint paint;
     private int r;
     private int height, width;
     private Random random;
     private ArrayList<estrela> estrelas;
 
+    // controlar quais satelites devem ser desenhados e se estão sendo usados
     private boolean filtroGPS = true;
     private boolean filtroGalileo = true;
     private boolean filtroGlonass = true;
@@ -42,17 +43,18 @@ public class EsferaCelesteView extends View {
             this.velocidade = speed;
         }
 
+        // atualiza a posição da estrela e simula movimento
         void updatePosition() {
-            y += velocidade;
-            if (y > r) {
-                y = -r;
-                x = random.nextFloat() * 2 * r - r;
-                velocidade = 0.5f + random.nextFloat();
+            y += velocidade;  // a posicao é incrementada com a  velocidade e a estrela move em direcao ao fundo
+            if (y > r) { // quando a estrela atinge o fundo
+                y = -r; // ela reaparece no topo
+                x = random.nextFloat() * 2 * r - r; // posicao horizontal aleatoria
+                velocidade = 0.5f + random.nextFloat(); // velocidade aleatoria
             }
         }
     }
 
-    public EsferaCelesteView(Context context, @Nullable AttributeSet attrs) {
+    public EsferaCelesteView(Context context, @Nullable AttributeSet attrs) { // contrutor gera 300 estrelas
         super(context, attrs);
         paint = new Paint();
         random = new Random();
@@ -67,6 +69,7 @@ public class EsferaCelesteView extends View {
             estrelas.add(new estrela(x, y, speed));
         }
 
+        // abre um listener onclick que abre um dialogo para configurar os satelites
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +78,9 @@ public class EsferaCelesteView extends View {
         });
     }
 
-    private boolean deveDesenharSatelite(int sateliteIndex) {
+    private boolean deveDesenharSatelite(int sateliteIndex) { //verifica se o satelite deve ser desenhado com base na constelacao
+        // e se ele esta sendo usado no calculo da posição
+
         int tipoConstelacao = newStatus.getConstellationType(sateliteIndex);
         boolean usandoFix = newStatus.usedInFix(sateliteIndex);
         boolean ChecandoConstelacao = (tipoConstelacao == GnssStatus.CONSTELLATION_GPS && filtroGPS) ||
@@ -86,7 +91,7 @@ public class EsferaCelesteView extends View {
     }
 
     @Override
-    protected void onDraw(@NonNull Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) { //desenhar a esfera celeste e os satelites
         super.onDraw(canvas);
         width = getMeasuredWidth();
         height = getMeasuredHeight();
@@ -122,7 +127,7 @@ public class EsferaCelesteView extends View {
         postInvalidateDelayed(30);
     }
 
-    private void desenharEstrelas(Canvas canvas) {
+    private void desenharEstrelas(Canvas canvas) { // desenha cada estrela na tela e se estiver fora do raio a posição e randomziada
         paint.setColor(Color.WHITE);
         for (EsferaCelesteView.estrela estrela : estrelas) {
             if (Math.sqrt(estrela.x * estrela.x + estrela.y * estrela.y) <= r) {
@@ -139,24 +144,24 @@ public class EsferaCelesteView extends View {
 
     private void desenhaSatelite(Canvas canvas, float cx, float cy, int tipoConstelacao) {
         switch (tipoConstelacao) {
-            case GnssStatus.CONSTELLATION_GPS:
+            case GnssStatus.CONSTELLATION_GPS: // desenha um octaedro amarelo
                 paint.setColor(Color.YELLOW);
                 desenharOctaedro(canvas, cx, cy);
                 break;
 
-            case GnssStatus.CONSTELLATION_GALILEO:
+            case GnssStatus.CONSTELLATION_GALILEO: //desenha um círculo azul
                 paint.setColor(Color.BLUE);
                 canvas.drawCircle(cx, cy, 15, paint);
                 break;
 
-            case GnssStatus.CONSTELLATION_GLONASS:
+            case GnssStatus.CONSTELLATION_GLONASS: // desenha uma forma de cruz vermelha
                 paint.setColor(Color.RED);
                 float[] caminhoX = {cx, cx - 10, cx, cx + 10};
                 float[] caminhoY = {cy - 10, cy, cy + 10, cy};
                 canvas.drawPath(criarCaminho(caminhoX, caminhoY), paint);
                 break;
 
-            default:
+            default: //  desenha um retângulo cinza
                 paint.setColor(Color.GRAY);
                 canvas.drawRect(cx - 5, cy - 15, cx + 5, cy + 5, paint);
                 break;
@@ -186,7 +191,7 @@ public class EsferaCelesteView extends View {
         return path;
     }
 
-    private void desenhaSateliteInfo(Canvas canvas, float x, float y, int satelliteIndex) {
+    private void desenhaSateliteInfo(Canvas canvas, float x, float y, int satelliteIndex) { //exibe informações sobre o satelite
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(30);
         paint.setColor(Color.RED);
@@ -203,8 +208,8 @@ public class EsferaCelesteView extends View {
         float backgroundWidth = 250;
         float backgroundHeight = 100;
         paint.setColor(Color.argb(150, 0, 0, 0));
-        canvas.drawRect(infoX, infoY - 10, infoX + backgroundWidth, infoY + backgroundHeight, paint);
-        paint.setColor(Color.RED); // Cor do texto
+        canvas.drawRect(infoX, infoY - 10, infoX + backgroundWidth, infoY + backgroundHeight, paint); // desenha um retangulo para melhorar a legibilidade
+        paint.setColor(Color.RED);
         canvas.drawText("ID: " + satID, infoX + 5, infoY + 25, paint);
         canvas.drawText("Constelação: " + constelacao, infoX + 5, infoY + 55, paint);
         canvas.drawText("Usado: " + usadoFix, infoX + 5, infoY + 85, paint);
@@ -223,7 +228,7 @@ public class EsferaCelesteView extends View {
         }
     }
 
-    private void mostrarDialog(Context context) {
+    private void mostrarDialog(Context context) {  // cria e mostra uma caixa de dialogo que permite o usuario configurar filtros de quais satelites devem ser exibidos
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Filtros de Satélites");
         builder.setMessage("Selecione os tipos de satélites que deseja visualizar:");
@@ -308,6 +313,7 @@ public class EsferaCelesteView extends View {
         invalidate();
     }
 
+    //convertem coordenadas cartesianas centradas na origem da esfera para a tela, onde o centro da esfera é o centro da tela
     private float computarXc(float x) {
         return width / 2 + x;
     }

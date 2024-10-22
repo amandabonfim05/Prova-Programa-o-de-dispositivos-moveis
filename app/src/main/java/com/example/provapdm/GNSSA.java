@@ -23,18 +23,18 @@ import java.util.ArrayList;
 
 public class GNSSA extends AppCompatActivity {
     private LocationManager locationManager;
-    private LocationProvider locationProvider;
+    private LocationProvider locationProvider; // acesso ao servico de gps
     private static final int REQUEST_LOCATION = 1;
     private int latitudeFormato = Location.FORMAT_SECONDS;
     private int longitudeFormato = Location.FORMAT_SECONDS;
-    private TextView textViewLocalizacao;
+    private TextView textViewLocalizacao; // exibe localização na tela
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.esfera_celeste_layout);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        textViewLocalizacao = findViewById(R.id.textviewLocation_id);
+        textViewLocalizacao = findViewById(R.id.textviewLocation_id); // configura um listener para o clique que exibe um dialogo para escolher o formato das coordenadas
 
         textViewLocalizacao.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,10 +42,11 @@ public class GNSSA extends AppCompatActivity {
                 mostrarDialogoDeEscolha();
             }
         });
-        obtemLocationProvider_Permission();
+        obtemLocationProvider_Permission(); // verifica se o app tem permissao para acessar a localização e se n tiver solicita
     }
 
-    public void mostrarDialogoDeEscolha() {
+    public void mostrarDialogoDeEscolha() { // metodo para exibir um dialogo para escolher o formato das coordenadas
+        // e quando uma opção é escolhida lat e long sao atualizadas e a ultima localização conhecida é obtida e mostrada na tela
         String[] formatos = {"Graus [+/-DDD.DDDDD]",
                 "Graus-Minutos [+/-DDD:MM.MMMMM]",
                 "Graus-Minutos-Segundos [+/-DDD:MM:SS.SSSSS]"};
@@ -81,7 +82,7 @@ public class GNSSA extends AppCompatActivity {
         builder.create().show();
     }
 
-    public void obtemLocationProvider_Permission() {
+    public void obtemLocationProvider_Permission() { // verifica se tem permissao e se tiver o app recebe atualizações de localização e se n tiver solicita
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
@@ -94,7 +95,8 @@ public class GNSSA extends AppCompatActivity {
         }
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) { // ao responder a solicitação, se concedida o app obtem o provedor de loc
+        // e comeca a coletar os dados. se negada uma mensagem é exibida e o app é fechado
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_LOCATION) {
             if (grantResults.length == 1 && grantResults[0] ==
@@ -108,7 +110,7 @@ public class GNSSA extends AppCompatActivity {
         }
     }
 
-    public void startLocationAndGNSSUpdates() {
+    public void startLocationAndGNSSUpdates() { // solicita atualizações de loc, registra um callback para monitorar o status e atualiza a interface grafica
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -135,7 +137,7 @@ public class GNSSA extends AppCompatActivity {
 
     }
 
-    public void mostraGNSSGrafico(GnssStatus status) {
+    public void mostraGNSSGrafico(GnssStatus status) { // coleta dados dos satelites e os exibe
         ArrayList<String> sateliteIds = new ArrayList<>();
         ArrayList<Float> dadosQualidadeSinal = new ArrayList<>();
         int contagemSatelites = status.getSatelliteCount();
@@ -149,7 +151,7 @@ public class GNSSA extends AppCompatActivity {
         qualidadeSateliteView.setSignalQualityData(sateliteIds, dadosQualidadeSinal);
     }
 
-    public void mostraLocation(Location localizacao) {
+    public void mostraLocation(Location localizacao) { //coleta dados dos satelites e os exibe
         String dados = "Dados da Última posição\n";
         if (localizacao != null) {
             String latitudeSatelite = Location.convert(localizacao.getLatitude(), latitudeFormato);
